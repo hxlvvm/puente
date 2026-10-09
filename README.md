@@ -26,7 +26,7 @@ Puente does two things:
 
 | System | Pitfall pass | ...words in guard list | ...held-out words | Red-flag recall | Symptom F1 | Medication F1 | Whole intake exact | Asks when not needed | Quotes found in text |
 |---|---|---|---|---|---|---|---|---|---|
-| Keyword dictionary (no model) | **35.5** | 32.7 | 42.9 | 89.7 | 85.4 | 100.0 | 51.0 | 0.0 | 100.0 |
+| Keyword dictionary (no model) | **35.5** | 32.7 | 42.9 | 89.7 | 85.4 | 100.0 | 57.4 | 0.0 | 100.0 |
 | Qwen2.5-7B-Instruct, read Spanish directly | **54.6** | 50.9 | 64.3 | 89.7 | 63.6 | 97.4 | 43.2 | 8.0 | 85.5 |
 | Qwen2.5-7B-Instruct, read Spanish directly + guard | **58.6** | 57.3 | 61.9 | 89.7 | 63.4 | 98.7 | 42.6 | 18.8 | 86.7 |
 | Qwen2.5-7B-Instruct, translate, then extract | **53.9** | 54.5 | 52.4 | 85.9 | 55.9 | 99.4 | 47.0 | 9.4 | 79.3 |

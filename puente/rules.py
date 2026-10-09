@@ -40,7 +40,7 @@ def extract(text):
                 meds.append({"name": name, "dose": f"{dose.group(1)} mg" if dose else "", "frequency": freq,
                              "evidence": s.strip()})
     allergies = [{"substance": "penicillin" if "penicil" in s else "sulfa", "evidence": s.strip()}
-                 for s in sentences if "alerg" in s and ("penicil" in s or "sulfa" in s)]
+                 for s in sentences if re.search(r"al[eé]rg", s) and ("penicil" in s or "sulfa" in s)]
     conditions = [{"name": n, "evidence": s.strip()} for s in sentences
                   for p, n in ((r"presi[oó]n alta", "hypertension"), (r"\basma\b", "asthma")) if re.search(p, s)]
     dur = None

@@ -17,3 +17,8 @@ def test_keyword_baseline_runs_through_the_pipeline_and_scorer():
     recs = pipelines.run(Rules(), [c["text"] for c in cases], "direct")
     s = summarize([score_case(c, r["intake"], r["read"]) for c, r in zip(cases, recs)])
     assert s["valid_rate"] == 1.0 and s["grounding"] == 1.0
+
+
+def test_keyword_baseline_handles_accents_in_allergies():
+    d = extract("Soy alérgico a la penicilina. Tengo alergia a las sulfas.")
+    assert {a["substance"] for a in d["allergies"]} == {"penicillin", "sulfa"}

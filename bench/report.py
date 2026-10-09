@@ -65,8 +65,8 @@ def main():
     print("|---|" + "---|" * len(FAMILIES))
     for s in runs:
         print(f"| {label(s['config'])} | " + " | ".join(pct(s["pitfall_by_family"].get(f)) for f in FAMILIES) + " |")
-    print("\n### The ambiguous 'intoxicado' cases (correct answer: ask what was taken), %\n")
-    print("| System | Asked | Food/literal sense right |")
+    print("\n### The ambiguous 'intoxicado' cases (correct answer: ask what was taken, without guessing), %\n")
+    print("| System | Asked without guessing a cause | Food sense right |")
     print("|---|---|---|")
     for s in runs:
         v = s["pitfall_by_variant"]

@@ -1,0 +1,75 @@
+{
+ "n": 296,
+ "valid_rate": 1.0,
+ "symptoms": {
+  "precision": 0.8390804597701149,
+  "recall": 0.8690476190476191,
+  "f1": 0.8538011695906432
+ },
+ "conditions": {
+  "precision": 1.0,
+  "recall": 0.7647058823529411,
+  "f1": 0.8666666666666666
+ },
+ "medications": {
+  "precision": 1.0,
+  "recall": 1.0,
+  "f1": 1.0
+ },
+ "medication_names": {
+  "precision": 1.0,
+  "recall": 1.0,
+  "f1": 1.0
+ },
+ "allergies": {
+  "precision": 1.0,
+  "recall": 0.5797101449275363,
+  "f1": 0.7339449541284404
+ },
+ "red_flags": {
+  "precision": 1.0,
+  "recall": 0.8974358974358975,
+  "f1": 0.945945945945946
+ },
+ "red_flag_recall": 0.8974358974358975,
+ "pregnant_acc": 1.0,
+ "duration_acc": 0.9054054054054054,
+ "exact_case_acc": 0.5101351351351351,
+ "over_ask_rate": 0.0,
+ "grounding": 1.0,
+ "pitfall_pass": 0.35526315789473684,
+ "pitfall_by_variant": {
+  "azucar/control": 1.0,
+  "azucar/diabetes": 0.0,
+  "azucar/low": 0.0,
+  "boca_estomago/control": 1.0,
+  "boca_estomago/pitfall": 0.0,
+  "constipado/control": 1.0,
+  "constipado/pitfall": 0.0,
+  "embarazada/control": 1.0,
+  "embarazada/pitfall": 1.0,
+  "intoxicado/alcohol": 0.5,
+  "intoxicado/ambiguous": 0.0,
+  "intoxicado/drug": 0.0,
+  "intoxicado/food": 0.0,
+  "nervios/control": 0.0,
+  "nervios/pitfall": 0.0
+ },
+ "pitfall_by_family": {
+  "azucar": 0.25,
+  "boca_estomago": 0.3333333333333333,
+  "constipado": 0.5,
+  "embarazada": 1.0,
+  "intoxicado": 0.13043478260869565,
+  "nervios": 0.0
+ },
+ "config": {
+  "model": "keyword-rules",
+  "pipeline": "direct",
+  "guard": false,
+  "n": 296
+ },
+ "dropped_items": 0,
+ "pitfall_in_guard_lexicon": 0.32727272727272727,
+ "pitfall_held_out": 0.42857142857142855
+}

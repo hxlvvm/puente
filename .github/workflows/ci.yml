@@ -1,0 +1,46 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Benchmark file is reproducible from the templates
+        run: |
+          python -m bench.build
+          git diff --exit-code data/cases.jsonl
+      - run: python -m pytest -q
+
+  docker:
+    # Builds the image and checks the live API with the keyword backend (no API key in CI).
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t puente .
+      - run: docker run -d -p 8000:8000 -e PUENTE_BACKEND=rules --name puente puente
+      - name: Wait for the API
+        run: for i in $(seq 60); do curl -sf localhost:8000/health && exit 0; sleep 2; done; docker logs puente; exit 1
+      - name: Intake request
+        run: |
+          curl -sf -X POST localhost:8000/intake -H 'content-type: application/json' \
+            -d '{"text": "Comí mariscos y desde anoche estoy intoxicado, con vómito. Soy alérgico a la penicilina."}' | tee out.json
+          python - <<'PY'
+          import json
+          d = json.load(open("out.json"))
+          assert "vomiting" in {s["name"] for s in d["intake"]["symptoms"]}, d
+          assert [a["family"] for a in d["word_alerts"]] == ["intoxicado"], d
+          assert d["intake"]["allergies"][0]["substance"] == "penicillin", d
+          PY
+      - name: Reviewer page
+        run: curl -sf localhost:8000/ | grep -q "Not for clinical use"

@@ -1,0 +1,83 @@
+{
+ "text": "Buenas tardes, quería consultarle algo. Ayer cené pollo recalentado y quedé intoxicado: vomité toda la noche. Tengo alergia a las sulfas. Uso ibuprofeno de 400 miligramos cuando lo necesito.",
+ "source": "Saved output of gemini-3.5-flash-lite (direct, no guard) on benchmark case c0013",
+ "response": {
+  "intake": {
+   "chief_complaint": "Food poisoning and vomiting after eating reheated chicken",
+   "symptoms": [
+    {
+     "name": "food_poisoning",
+     "status": "present",
+     "evidence": "quedé intoxicado"
+    },
+    {
+     "name": "vomiting",
+     "status": "present",
+     "evidence": "vomité toda la noche"
+    }
+   ],
+   "conditions": [],
+   "medications": [
+    {
+     "name": "ibuprofen",
+     "dose": "400 miligramos",
+     "frequency": "as_needed",
+     "evidence": "ibuprofeno de 400 miligramos cuando lo necesito"
+    }
+   ],
+   "allergies": [
+    {
+     "substance": "sulfas",
+     "evidence": "alergia a las sulfas"
+    }
+   ],
+   "duration_days": 1,
+   "pregnant": "not_mentioned",
+   "red_flags": [],
+   "needs_clarification": [],
+   "culture_bound": [],
+   "summary_en": "The patient reports food poisoning and vomiting all night starting yesterday after eating reheated chicken. They report a sulfa allergy and use 400 mg of ibuprofen as needed."
+  },
+  "read": "Buenas tardes, quería consultarle algo. Ayer cené pollo recalentado y quedé intoxicado: vomité toda la noche. Tengo alergia a las sulfas. Uso ibuprofeno de 400 miligramos cuando lo necesito.",
+  "word_alerts": [
+   {
+    "family": "intoxicado",
+    "note": "Spanish 'intoxicado/a' means poisoned or made sick by something taken in (food, a chemical, a medicine, alcohol). It does not by itself mean drunk or high. Decide from context: after food -> food_poisoning; after alcohol -> alcohol_intoxication; after pills or drugs -> drug_overdose. If the context does not say what was taken, list 'intoxicado' under needs_clarification.",
+    "sources": [
+     "OpenExamPrep, CCHI Certified Healthcare Interpreter study guide, 'Abbreviations, Eponyms, False Cognates & Terminology Management' (open-exam-prep.com/study-guides/cchi-chi/terminology-word-structure/abbreviations-eponyms-false-cognates-terminology-management)",
+     "J. DeCamp, 'When Intoxicado ≠ Intoxicated: Avoiding False Friends and Critical Consequences in Machine Translation', MITRE, 2017 (kde.mitre.org/?p=3911)",
+     "J Gen Intern Med 2024, doi:10.1007/s11606-024-08619-8 (case in which 'intoxicado' led to an overdose work-up)"
+    ]
+   }
+  ],
+  "evidence_checks": [
+   {
+    "field": "symptoms",
+    "item": "food_poisoning",
+    "quote": "quedé intoxicado",
+    "found_in_text": true
+   },
+   {
+    "field": "symptoms",
+    "item": "vomiting",
+    "quote": "vomité toda la noche",
+    "found_in_text": true
+   },
+   {
+    "field": "medications",
+    "item": "ibuprofen",
+    "quote": "ibuprofeno de 400 miligramos cuando lo necesito",
+    "found_in_text": true
+   },
+   {
+    "field": "allergies",
+    "item": "sulfas",
+    "quote": "alergia a las sulfas",
+    "found_in_text": true
+   }
+  ],
+  "pipeline": "direct",
+  "guard": false,
+  "latency_ms": null
+ }
+}

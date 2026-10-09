@@ -1,0 +1,8 @@
+# API, benchmark scoring and tests (CPU). Speech input needs requirements-asr.txt; local GPU models need
+# requirements-gpu.txt.
+fastapi==0.115.12
+uvicorn==0.34.2
+pydantic==2.11.3
+python-multipart==0.0.20
+httpx==0.28.1
+pytest==8.3.5

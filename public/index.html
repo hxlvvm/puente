@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Puente</title>
+<meta name="description" content="Spanish patient message to structured English intake, with every field tied to the patient's own words. Demo with synthetic data; not for clinical use.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: sticky top bar; "Try it" is a 5/7 two-panel workspace (stacks on phones); Benchmark and About are reading columns. */
+:root {
+  --bg: #f2f5f4; --surface: #ffffff; --sunk: #f7f9f8; --ink: #132025; --muted: #5b6b70; --line: #dbe2e0;
+  --primary: #0f5c55; --primary-ink: #ffffff; --primary-weak: #e2f0ed;
+  --es: #9a4a07; --es-bg: #fcebd2;
+  --danger: #b42318; --danger-bg: #fdeceb; --warn: #855700; --warn-bg: #fdf3d8; --ok: #1a7f37; --ok-bg: #e4f4e8;
+  --k-sym: #0f5c55; --k-med: #6b3fa0; --k-all: #b42353; --k-cond: #1f5aa8;
+  --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  --radius: 12px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0d1315; --surface: #141c1f; --sunk: #10171a; --ink: #e3ebe9; --muted: #96a6a8; --line: #253230;
+  --primary: #5cc5b6; --primary-ink: #06201c; --primary-weak: #13302c;
+  --es: #f5b25a; --es-bg: #3a2810;
+  --danger: #ff8f84; --danger-bg: #3a1d1b; --warn: #f3c56b; --warn-bg: #3a2e14; --ok: #7fd69a; --ok-bg: #16301f;
+  --k-sym: #5cc5b6; --k-med: #b99cf0; --k-all: #f590b0; --k-cond: #8db6f5; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0d1315; --surface: #141c1f; --sunk: #10171a; --ink: #e3ebe9; --muted: #96a6a8; --line: #253230;
+  --primary: #5cc5b6; --primary-ink: #06201c; --primary-weak: #13302c;
+  --es: #f5b25a; --es-bg: #3a2810;
+  --danger: #ff8f84; --danger-bg: #3a1d1b; --warn: #f3c56b; --warn-bg: #3a2e14; --ok: #7fd69a; --ok-bg: #16301f;
+  --k-sym: #5cc5b6; --k-med: #b99cf0; --k-all: #f590b0; --k-cond: #8db6f5; color-scheme: dark }
+
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--ink); font: 15px/1.55 var(--sans); -webkit-font-smoothing: antialiased; }
+a { color: var(--primary); }
+:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; border-radius: 6px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+
+/* top bar */
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: color-mix(in srgb, var(--bg) 88%, transparent);
+       backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+.bar-in { max-width: 1180px; margin: 0 auto; padding: 10px 18px; display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 10px; font: 700 21px/1 var(--display); letter-spacing: -0.01em; color: var(--ink); text-decoration: none; }
+.brand svg { width: 34px; height: 22px; }
+.tabs { display: flex; gap: 4px; background: var(--sunk); border: 1px solid var(--line); padding: 3px; border-radius: 10px; }
+.tabs button { border: 0; background: transparent; color: var(--muted); font: 500 14px var(--sans); padding: 6px 12px; border-radius: 7px; cursor: pointer; }
+.tabs button[aria-selected="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 2px rgb(0 0 0 / .08); }
+.spacer { flex: 1; }
+.gh { font: 500 13px var(--sans); color: var(--muted); text-decoration: none; display: inline-flex; gap: 6px; align-items: center; }
+.ribbon { background: var(--warn-bg); color: var(--warn); font-size: 13px; text-align: center; padding: 6px 18px; }
+
+main { max-width: 1180px; margin: 0 auto; padding-inline: 18px; padding-block: 22px 60px; }
+h1, h2, h3 { font-family: var(--display); letter-spacing: -0.01em; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(24px, 3.2vw, 34px); line-height: 1.12; font-weight: 700; }
+h2 { font-size: 20px; font-weight: 700; }
+h3 { font-size: 15px; font-weight: 600; font-family: var(--sans); }
+.lede { color: var(--muted); max-width: 68ch; margin: 8px 0 0; }
+.label { font: 500 11.5px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+
+/* try-it workspace */
+.intro { display: grid; gap: 4px; margin-bottom: 18px; }
+.work { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 18px; align-items: start; }
+@media (max-width: 880px) { .work { grid-template-columns: minmax(0, 1fr); } }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+.pad { padding: 16px; }
+.stack { display: grid; gap: 14px; }
+.input-card { position: sticky; top: 74px; }
+@media (max-width: 880px) { .input-card { position: static; } }
+textarea { width: 100%; min-height: 150px; resize: vertical; font: 15px/1.55 var(--sans); color: var(--ink); background: var(--sunk);
+           border: 1px solid var(--line); border-radius: 10px; padding: 12px; }
+textarea:focus { outline: 2px solid var(--primary); outline-offset: 0; border-color: transparent; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.between { justify-content: space-between; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { border: 1px solid var(--line); background: var(--sunk); color: var(--ink); border-radius: 999px; padding: 4px 10px; font: 13px var(--sans); cursor: pointer; }
+.chip:hover { border-color: var(--primary); }
+.chip b { font-weight: 600; color: var(--es); font-style: italic; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 9px; overflow: hidden; }
+.seg label { padding: 6px 11px; font-size: 13.5px; cursor: pointer; color: var(--muted); background: var(--sunk); }
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg input:checked + span { color: var(--ink); font-weight: 600; }
+.seg label:has(input:checked) { background: var(--surface); box-shadow: inset 0 -2px 0 var(--primary); }
+.switch { display: inline-flex; gap: 8px; align-items: center; font-size: 13.5px; cursor: pointer; }
+.switch input { appearance: none; width: 34px; height: 20px; border-radius: 999px; background: var(--line); position: relative; cursor: pointer; transition: background .15s; }
+.switch input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 14px; height: 14px; border-radius: 50%; background: var(--surface); transition: left .15s; }
+.switch input:checked { background: var(--primary); }
+.switch input:checked::after { left: 17px; }
+.btn { border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 9px; padding: 8px 14px; font: 500 14px var(--sans); cursor: pointer; display: inline-flex; gap: 8px; align-items: center; }
+.btn.primary { background: var(--primary); color: var(--primary-ink); border-color: var(--primary); font-weight: 600; }
+.btn[disabled] { opacity: .6; cursor: progress; }
+.hint { color: var(--muted); font-size: 12.5px; }
+.count { font: 12px var(--mono); color: var(--muted); }
+.spin { width: 14px; height: 14px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: s .7s linear infinite; }
+@keyframes s { to { transform: rotate(360deg); } }
+
+/* results */
+.res-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.badge { font: 500 11.5px var(--mono); padding: 2px 8px; border-radius: 6px; background: var(--primary-weak); color: var(--primary); }
+.flags { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; padding: 10px 14px; border-radius: 10px; }
+.flags.on { background: var(--danger-bg); color: var(--danger); }
+.flags.off { background: var(--sunk); color: var(--muted); border: 1px dashed var(--line); }
+.pill { display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px; border-radius: 999px; font-size: 13px; font-weight: 600; }
+.pill.danger { background: var(--surface); color: var(--danger); border: 1px solid currentColor; }
+.note { display: grid; gap: 4px; padding: 10px 12px; border-radius: 10px; background: var(--warn-bg); color: var(--ink); }
+.note .tag { font: 600 11.5px var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--warn); }
+.note details { font-size: 12.5px; color: var(--muted); }
+.source { font-size: 16px; line-height: 1.75; background: var(--sunk); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; }
+mark { background: var(--es-bg); color: inherit; border-bottom: 2px solid var(--es); border-radius: 3px; padding: 0 1px; transition: background .12s, box-shadow .12s; }
+mark.k-symptoms { border-color: var(--k-sym); } mark.k-medications { border-color: var(--k-med); }
+mark.k-allergies { border-color: var(--k-all); } mark.k-conditions { border-color: var(--k-cond); }
+mark.hot { box-shadow: 0 0 0 2px var(--es); }
+.tbl { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font: 500 11.5px var(--mono); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+tbody tr { transition: background .1s; }
+tbody tr.hot, tbody tr:hover { background: var(--sunk); }
+.kind { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); white-space: nowrap; }
+.kind i { width: 8px; height: 8px; border-radius: 2px; display: inline-block; }
+.val { font-weight: 600; }
+.status { font-size: 12px; color: var(--muted); font-weight: 400; }
+.denied { text-decoration: line-through; text-decoration-color: var(--muted); }
+.quote { font-style: italic; color: var(--es); }
+.check { font: 12px var(--mono); white-space: nowrap; }
+.check.ok { color: var(--ok); } .check.bad { color: var(--danger); }
+.facts { display: flex; gap: 8px; flex-wrap: wrap; }
+.fact { background: var(--sunk); border: 1px solid var(--line); border-radius: 9px; padding: 6px 10px; font-size: 13.5px; }
+.fact span { color: var(--muted); margin-right: 6px; }
+.summary { font-size: 15px; }
+.err { color: var(--danger); background: var(--danger-bg); border-radius: 10px; padding: 10px 12px; }
+
+/* benchmark */
+.reading { max-width: 980px; display: grid; gap: 22px; }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.tile { padding: 14px 16px; display: grid; gap: 4px; }
+.tile b { font: 600 30px/1.1 var(--display); font-variant-numeric: tabular-nums; }
+.tile span { color: var(--muted); font-size: 13.5px; }
+.bars { display: grid; gap: 8px; }
+.barrow { display: grid; grid-template-columns: minmax(0, 300px) 1fr 52px; gap: 10px; align-items: center; font-size: 13.5px; }
+@media (max-width: 640px) { .barrow { grid-template-columns: minmax(0, 1fr) 52px; } .barrow .track { grid-column: 1 / -1; order: 3; } }
+.track { height: 12px; background: var(--sunk); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.fill { height: 100%; background: var(--primary); border-radius: 6px; }
+.fill.base { background: var(--muted); }
+.num { font: 500 13px var(--mono); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+td.heat { font: 500 13px var(--mono); text-align: right; font-variant-numeric: tabular-nums; }
+.prose { max-width: 70ch; display: grid; gap: 10px; }
+.prose p { margin: 0; }
+.prose ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<div class="bar"><div class="bar-in">
+  <a class="brand" href="#try" aria-label="Puente home">
+    <svg viewBox="0 0 34 22" aria-hidden="true"><path d="M2 20 Q17 -4 32 20" fill="none" stroke="var(--primary)" stroke-width="2.6" stroke-linecap="round"/><path d="M1 20H33" stroke="var(--ink)" stroke-width="2" stroke-linecap="round"/><path d="M10 9V20M17 6V20M24 9V20" stroke="var(--primary)" stroke-width="1.6"/></svg>
+    Puente
+  </a>
+  <div class="tabs" role="tablist" aria-label="Sections">
+    <button role="tab" id="t-try" aria-controls="try" aria-selected="true">Try it</button>
+    <button role="tab" id="t-bench" aria-controls="benchmark" aria-selected="false">Benchmark</button>
+    <button role="tab" id="t-about" aria-controls="about" aria-selected="false">About</button>
+  </div>
+  <span class="spacer"></span>
+  <a class="gh" href="https://github.com/hxlvvm/puente" target="_blank" rel="noopener">
+    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0a8 8 0 0 0-2.5 15.6c.4 0 .5-.2.5-.4v-1.5c-2.2.5-2.7-1-2.7-1-.4-.9-.9-1.2-.9-1.2-.7-.5.1-.5.1-.5.8.1 1.2.8 1.2.8.7 1.3 1.9.9 2.3.7.1-.5.3-.9.5-1.1-1.8-.2-3.6-.9-3.6-4 0-.9.3-1.6.8-2.1-.1-.2-.4-1 .1-2.1 0 0 .7-.2 2.2.8a7.6 7.6 0 0 1 4 0c1.5-1 2.2-.8 2.2-.8.4 1.1.2 1.9.1 2.1.5.6.8 1.3.8 2.1 0 3.1-1.9 3.8-3.6 4 .3.3.6.8.6 1.5v2.2c0 .2.1.5.6.4A8 8 0 0 0 8 0z"/></svg>
+    Source and data
+  </a>
+</div></div>
+<div class="ribbon" role="note">Demo with synthetic examples only. Do not enter real patient information. Not for clinical use.</div>
+
+<main>
+  <!-- TRY IT -->
+  <section id="try" role="tabpanel" aria-labelledby="t-try">
+    <div class="intro">
+      <h1>Spanish patient message in, English intake out.</h1>
+      <p class="lede">Every field is tied to the patient's own words, and Spanish words that commonly get misread, like <i>intoxicado</i>, which usually means food poisoning rather than drunk, are flagged for the reviewer.</p>
+    </div>
+    <div class="work">
+      <form class="card pad stack input-card" id="form" autocomplete="off">
+        <div class="row between">
+          <label class="label" for="msg">Patient message · Spanish</label>
+          <span class="count" id="count">0 / 2000</span>
+        </div>
+        <textarea id="msg" maxlength="2000" placeholder="Escriba el mensaje del paciente…"></textarea>
+        <div class="stack" style="gap:6px">
+          <span class="hint">Try a tricky word:</span>
+          <div class="chips" id="examples"></div>
+        </div>
+        <div class="row between">
+          <div class="seg" role="radiogroup" aria-label="How the model reads the message">
+            <label><input type="radio" name="pipeline" id="p-direct" value="direct" checked><span>Read Spanish</span></label>
+            <label><input type="radio" name="pipeline" id="p-translate" value="translate"><span>Translate first</span></label>
+          </div>
+          <label class="switch" title="Adds interpreter-glossary notes for known Spanish pitfalls to the prompt">
+            <input type="checkbox" id="guard" checked> Pitfall guard
+          </label>
+        </div>
+        <div class="row">
+          <button class="btn primary" id="go" type="submit">Build intake</button>
+          <button class="btn" id="rec" type="button" hidden>Record voice</button>
+          <span class="hint" id="status" aria-live="polite"></span>
+        </div>
+      </form>
+
+      <div class="stack" id="out" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- BENCHMARK -->
+  <section id="benchmark" role="tabpanel" aria-labelledby="t-bench" hidden>
+    <div class="reading" id="bench">
+      <div class="intro">
+        <h1>How well do models read clinical Spanish?</h1>
+        <p class="lede" id="bench-lede">Synthetic patient messages, each with the intake it should produce. Every tricky word comes with a control case where the literal reading is right, so a system that always "corrects" a word fails.</p>
+      </div>
+      <div class="hint" id="bench-status">Loading results…</div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" role="tabpanel" aria-labelledby="t-about" hidden>
+    <div class="reading">
+      <div class="intro"><h1>Why this exists</h1></div>
+      <div class="prose">
+        <p>Spanish-speaking patients are a large part of US healthcare, and their messages are often read through machine translation or by an English-first system. Some Spanish words look like English words but mean something else. In a widely cited case, <i>intoxicado</i> was read as "intoxicated" when the family meant the patient had been made sick by something he ate or took, and treatment was delayed. Translation tools still make that mistake.</p>
+        <h2>What it does</h2>
+        <ul>
+          <li><b>Read Spanish:</b> one model call reads the Spanish message and fills a fixed English intake form.</li>
+          <li><b>Translate first:</b> the message is translated to English, then the form is filled from the translation. This is the usual "translate, then use the English system" design.</li>
+          <li><b>Pitfall guard:</b> notes from medical-interpreting sources are added for known pitfall words. Two word families are kept out of the guard on purpose, so the benchmark shows whether it helps beyond the words it was given.</li>
+          <li>Every symptom, medication, allergy and condition must quote the patient's words. The page checks that each quote really appears in the message.</li>
+        </ul>
+        <h2>What it is not</h2>
+        <ul>
+          <li>Not a medical device and not for clinical use. The benchmark is synthetic and template-built, not real patient data.</li>
+          <li>The Spanish test messages were written with AI assistance and have not yet been reviewed by a native-speaking clinician or interpreter.</li>
+          <li>The public demo runs on a free-tier hosted model, so never type real patient information.</li>
+        </ul>
+        <h2>Sources for the word meanings</h2>
+        <ul>
+          <li>CCHI Certified Healthcare Interpreter study guide: false cognates (<i>embarazada</i>, <i>constipado</i>, <i>intoxicado</i>).</li>
+          <li>J. DeCamp, "When Intoxicado ≠ Intoxicated", MITRE, 2017.</li>
+          <li>J Gen Intern Med 2024, doi:10.1007/s11606-024-08619-8.</li>
+          <li>Real Academia Española, entry "estómago" (<i>boca del estómago</i>).</li>
+          <li>Studies of <i>ataque de nervios</i> as a cultural idiom of distress: doi:10.1007/s00127-023-02601-1, doi:10.1186/s40359-021-00544-3.</li>
+        </ul>
+        <p class="hint">Code MIT. Built by Abdul Haleem. Full data card and results on GitHub.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"}[c]));
+const human = (s) => String(s ?? "").replaceAll("_", " ");
+const pct = (x) => x == null ? "–" : (100 * x).toFixed(1);
+
+const EXAMPLES = [
+  ["intoxicado", "after food", "Ayer cené pollo recalentado y quedé intoxicado: vomité toda la noche. Tengo alergia a las sulfas."],
+  ["intoxicado", "unclear", "Mi esposo llegó a la casa intoxicado y ahora está muy somnoliento."],
+  ["embarazada", "", "Estoy embarazada de ocho semanas y tengo sangrado vaginal desde esta mañana. Tomo metformina de 850 miligramos dos veces al día."],
+  ["constipado", "", "Estoy constipada: tengo la nariz tapada, mocos y estornudos. No tengo fiebre."],
+  ["ataque de nervios", "", "Desde que murió mi esposo me dan ataques de nervios: grito, tiemblo y siento que pierdo el control."],
+  ["rash", "Spanglish", "Me salió un rash en los brazos hace tres días. Soy alérgico a la penicilina."],
+];
+const ex = $("#examples");
+for (const [w, sub, text] of EXAMPLES) {
+  const b = document.createElement("button");
+  b.type = "button"; b.className = "chip"; b.innerHTML = `<b>${esc(w)}</b>${sub ? " · " + esc(sub) : ""}`;
+  b.onclick = () => { $("#msg").value = text; updateCount(); $("#msg").focus(); };
+  ex.appendChild(b);
+}
+const updateCount = () => { $("#count").textContent = `${$("#msg").value.length} / 2000`; };
+$("#msg").addEventListener("input", updateCount);
+
+/* tabs with #hash deep links */
+const TABS = {try: "#t-try", benchmark: "#t-bench", about: "#t-about"};
+function show(name) {
+  if (!TABS[name]) name = "try";
+  for (const [k, t] of Object.entries(TABS)) {
+    $(t).setAttribute("aria-selected", String(k === name));
+    document.getElementById(k).hidden = k !== name;
+  }
+  if (name === "benchmark") loadBench();
+}
+for (const [k, t] of Object.entries(TABS)) $(t).onclick = () => { history.replaceState(null, "", "#" + k); show(k); };
+window.addEventListener("hashchange", () => show(location.hash.slice(1)));
+show(location.hash.slice(1));
+
+/* results rendering */
+const KIND = {symptoms: ["Symptom", "--k-sym"], conditions: ["Condition", "--k-cond"], medications: ["Medication", "--k-med"], allergies: ["Allergy", "--k-all"]};
+function highlight(text, quotes) {
+  const low = text.toLowerCase(), spans = [];
+  quotes.forEach((q, i) => {
+    const needle = q.quote.toLowerCase().replace(/^[\s.,;:"'«»]+|[\s.,;:"'«»]+$/g, "");
+    if (!needle) return;
+    let at = low.indexOf(needle);
+    while (at >= 0 && spans.some((s) => at < s.end && at + needle.length > s.start)) at = low.indexOf(needle, at + 1);
+    if (at >= 0) spans.push({start: at, end: at + needle.length, i, kind: q.kind});
+  });
+  spans.sort((a, b) => a.start - b.start);
+  let html = "", pos = 0;
+  for (const s of spans) {
+    html += esc(text.slice(pos, s.start)) + `<mark class="k-${s.kind}" data-i="${s.i}">${esc(text.slice(s.start, s.end))}</mark>`;
+    pos = s.end;
+  }
+  return html + esc(text.slice(pos));
+}
+
+function render(d, meta) {
+  const i = d.intake, rows = [];
+  for (const key of ["symptoms", "conditions", "medications", "allergies"]) {
+    for (const it of i[key]) {
+      let value = key === "medications" ? [it.name, it.dose, human(it.frequency || "")].filter(Boolean).join(" · ")
+                : key === "allergies" ? it.substance : human(it.name);
+      rows.push({kind: key, value, status: it.status, quote: it.evidence || ""});
+    }
+  }
+  const src = d.read || meta.text;
+  const found = (q) => q && src.toLowerCase().replace(/\s+/g, " ").includes(q.toLowerCase().replace(/^[\s.,;:"'«»]+|[\s.,;:"'«»]+$/g, "").replace(/\s+/g, " "));
+  let h = `<div class="res-head"><h2>${meta.example ? "Example output" : "Intake"}</h2>
+    <span class="badge">${esc(meta.badge)}</span></div>`;
+  h += i.red_flags.length
+    ? `<div class="flags on" role="alert"><b>Emergency signs</b> ${i.red_flags.map((f) => `<span class="pill danger">${esc(human(f))}</span>`).join("")}</div>`
+    : `<div class="flags off">No emergency signs detected</div>`;
+  const notes = [];
+  i.needs_clarification.forEach((t) => notes.push(["Ask the patient", `<b><i>${esc(t.term)}</i></b> ${esc(t.note)}`, ""]));
+  i.culture_bound.forEach((t) => notes.push(["Cultural idiom", `<b><i>${esc(t.term)}</i></b> ${esc(t.note)}`, ""]));
+  (d.word_alerts || []).forEach((a) => notes.push(["Word alert", esc(a.note), a.sources.map(esc).join("<br>")]));
+  if (notes.length) h += `<div class="stack" style="gap:8px">${notes.map(([tag, body, srcs]) =>
+    `<div class="note"><span class="tag">${tag}</span><div>${body}</div>${srcs ? `<details><summary>Sources</summary>${srcs}</details>` : ""}</div>`).join("")}</div>`;
+  h += `<div class="card pad stack" style="gap:10px"><span class="label">Patient's words${d.pipeline === "translate" ? " · as translated" : ""}</span>
+    <div class="source" id="src">${highlight(src, rows)}</div>
+    ${d.pipeline === "translate" ? `<span class="hint">Original: ${esc(meta.text)}</span>` : ""}</div>`;
+  h += `<div class="card"><div class="tbl"><table><thead><tr><th>Field</th><th>Value</th><th>Patient's words</th></tr></thead><tbody>`;
+  rows.forEach((r, n) => {
+    const ok = found(r.quote);
+    h += `<tr data-i="${n}" tabindex="0"><td><span class="kind"><i style="background:var(${KIND[r.kind][1]})"></i>${KIND[r.kind][0]}</span></td>
+      <td><span class="val ${r.status === "denied" ? "denied" : ""}">${esc(r.value)}</span>${r.status ? ` <span class="status">${r.status}</span>` : ""}</td>
+      <td>${r.quote ? `<span class="quote">“${esc(r.quote)}”</span> <span class="check ${ok ? "ok" : "bad"}">${ok ? "✓ in message" : "✗ not found"}</span>` : '<span class="hint">no quote</span>'}</td></tr>`;
+  });
+  if (!rows.length) h += `<tr><td colspan="3" class="hint">No symptoms, medications, allergies or conditions extracted.</td></tr>`;
+  h += `</tbody></table></div></div>`;
+  h += `<div class="facts"><div class="fact"><span>Duration</span>${i.duration_days == null ? "not stated" : i.duration_days + (i.duration_days === 1 ? " day" : " days")}</div>
+    <div class="fact"><span>Pregnant</span>${esc(human(i.pregnant))}</div></div>`;
+  h += `<div class="card pad stack" style="gap:8px"><div class="row between"><span class="label">Summary for the clinician</span>
+    <span class="row"><button class="btn" type="button" id="copy-sum">Copy summary</button><button class="btn" type="button" id="copy-json">Copy JSON</button></span></div>
+    <p class="summary" style="margin:0">${esc(i.summary_en || "—")}</p></div>`;
+  if (meta.example) h += `<p class="hint">${esc(meta.source)}. Press <b>Build intake</b> to run your own message.</p>`;
+  $("#out").innerHTML = h;
+  const link = (n, on) => {
+    document.querySelectorAll(`#src mark[data-i="${n}"]`).forEach((m) => m.classList.toggle("hot", on));
+    document.querySelectorAll(`tbody tr[data-i="${n}"]`).forEach((t) => t.classList.toggle("hot", on));
+  };
+  document.querySelectorAll("tbody tr[data-i], #src mark").forEach((el) => {
+    const n = el.dataset.i;
+    for (const [ev, on] of [["mouseenter", true], ["mouseleave", false], ["focus", true], ["blur", false]]) el.addEventListener(ev, () => link(n, on));
+  });
+  const copy = (txt, btn) => navigator.clipboard.writeText(txt).then(() => { btn.textContent = "Copied"; setTimeout(() => btn.textContent = btn.id === "copy-sum" ? "Copy summary" : "Copy JSON", 1400); })
+                                       .catch(() => { btn.textContent = "Copy not allowed"; });
+  $("#copy-sum").onclick = (e) => copy(i.summary_en || "", e.currentTarget);
+  $("#copy-json").onclick = (e) => copy(JSON.stringify(i, null, 2), e.currentTarget);
+}
+
+/* example on load, so the page shows what it does before any request */
+fetch("example.json").then((r) => r.ok ? r.json() : null).then((e) => {
+  if (!e) { $("#out").innerHTML = `<div class="card pad hint">Type or pick a message, then press Build intake.</div>`; return; }
+  $("#msg").value = e.text; updateCount();
+  render(e.response, {text: e.text, example: true, badge: "saved run", source: e.source});
+}).catch(() => {});
+
+$("#form").addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const text = $("#msg").value.trim();
+  if (text.length < 3) { $("#status").textContent = "Write a message first."; return; }
+  const pipeline = document.querySelector('input[name="pipeline"]:checked').value, guard = $("#guard").checked;
+  $("#go").disabled = true; $("#go").innerHTML = '<span class="spin" aria-hidden="true"></span> Reading…'; $("#status").textContent = "";
+  try {
+    const r = await fetch("/api/intake", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({text, pipeline, guard})});
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(r.status === 429 ? "Too many requests. Wait a minute and try again."
+                               : r.status === 503 ? "The model is busy or out of free quota. Try again later."
+                               : d.detail ? (typeof d.detail === "string" ? d.detail : "The message could not be processed.") : `Request failed (${r.status}).`);
+    render(d, {text, badge: `${pipeline === "direct" ? "read Spanish" : "translated first"}${guard ? " · guard on" : ""} · ${(d.latency_ms / 1000).toFixed(1)} s`});
+  } catch (e) {
+    $("#out").innerHTML = `<div class="err">${esc(e.message)}</div>`;
+  }
+  $("#go").disabled = false; $("#go").textContent = "Build intake";
+});
+
+/* speech input only where the server has it */
+fetch("/api/capabilities").then((r) => r.ok ? r.json() : null).then((c) => { if (c && c.speech) setupRec(); }).catch(() => {});
+function setupRec() {
+  const b = $("#rec"); b.hidden = false; let rec = null, chunks = [];
+  b.onclick = async () => {
+    if (rec && rec.state === "recording") { rec.stop(); return; }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({audio: true});
+      rec = new MediaRecorder(stream); chunks = [];
+      rec.ondataavailable = (e) => chunks.push(e.data);
+      rec.onstop = async () => {
+        stream.getTracks().forEach((t) => t.stop()); b.textContent = "Record voice"; $("#status").textContent = "Transcribing…";
+        const fd = new FormData(); fd.append("audio", new Blob(chunks, {type: "audio/webm"}), "audio.webm");
+        const r = await fetch("/api/transcribe", {method: "POST", body: fd}); const d = await r.json();
+        if (r.ok) { $("#msg").value = d.text; updateCount(); $("#status").textContent = `Transcribed ${d.duration_s} s`; }
+        else $("#status").textContent = d.detail || "Transcription failed.";
+      };
+      rec.start(); b.textContent = "Stop"; $("#status").textContent = "Recording…";
+    } catch (e) { $("#status").textContent = "Microphone not available."; }
+  };
+}
+
+/* benchmark tab */
+let benchLoaded = false;
+async function loadBench() {
+  if (benchLoaded) return; benchLoaded = true;
+  try {
+    const r = await fetch("results.json"); if (!r.ok) throw new Error();
+    const d = await r.json(), S = d.systems;
+    const best = [...S].sort((a, b) => b.pitfall_pass - a.pitfall_pass)[0];
+    const base = S.find((s) => s.model === "keyword-rules");
+    const qd = S.find((s) => s.model.startsWith("Qwen") && s.pipeline === "direct" && !s.guard);
+    const qg = S.find((s) => s.model.startsWith("Qwen") && s.pipeline === "direct" && s.guard);
+    $("#bench-lede").textContent = `${d.n_cases} synthetic patient messages, each with the intake it should produce. Every tricky word comes with a control case where the literal reading is right, so a system that always "corrects" a word fails.`;
+    let h = `<div class="tiles">
+      <div class="card tile"><b>${pct(best.pitfall_pass)}%</b><span>pitfall pass, best system<br>${esc(best.system)}</span></div>
+      <div class="card tile"><b>${pct(base.pitfall_pass)}%</b><span>keyword dictionary, the floor<br>(literal translation, no model)</span></div>
+      ${qd && qg ? `<div class="card tile"><b>${pct(qd.pitfall_pass)} → ${pct(qg.pitfall_pass)}%</b><span>open 7B model, without → with the pitfall guard</span></div>` : ""}
+    </div>`;
+    h += `<div class="card pad stack"><h2>Pitfall pass rate</h2><p class="hint" style="margin:0">A case passes only if every required item is present and every forbidden reading is absent.</p><div class="bars">`;
+    for (const s of [...S].sort((a, b) => b.pitfall_pass - a.pitfall_pass))
+      h += `<div class="barrow"><span>${esc(s.system)}</span><div class="track" role="img" aria-label="${pct(s.pitfall_pass)} percent"><div class="fill ${s.model === "keyword-rules" ? "base" : ""}" style="width:${100 * s.pitfall_pass}%"></div></div><span class="num">${pct(s.pitfall_pass)}%</span></div>`;
+    h += `</div></div>`;
+    h += `<div class="card"><div class="tbl"><table><thead><tr><th>System</th><th>Pitfall</th><th>Held-out words</th><th>Red-flag recall</th><th>Symptom F1</th><th>Medication F1</th><th>Asks when not needed</th><th>Quotes in text</th></tr></thead><tbody>`;
+    for (const s of S) h += `<tr><td>${esc(s.system)}</td><td class="heat">${pct(s.pitfall_pass)}</td><td class="heat">${pct(s.pitfall_held_out)}</td><td class="heat">${pct(s.red_flag_recall)}</td><td class="heat">${pct(s.symptom_f1)}</td><td class="heat">${pct(s.medication_f1)}</td><td class="heat">${pct(s.over_ask_rate)}</td><td class="heat">${pct(s.grounding)}</td></tr>`;
+    h += `</tbody></table></div></div>`;
+    const fams = ["intoxicado", "constipado", "embarazada", "azucar", "nervios", "boca_estomago"];
+    const fname = {azucar: "azúcar", nervios: "ataque de nervios", boca_estomago: "boca del estómago"};
+    h += `<div class="card"><div class="pad" style="padding-bottom:0"><h2>By word family</h2><p class="hint">Pass rate over each family's pitfall, control and ambiguous cases. <i>constipado</i> and <i>boca del estómago</i> are held out of the guard.</p></div><div class="tbl"><table><thead><tr><th>System</th>${fams.map((f) => `<th><i>${fname[f] || f}</i></th>`).join("")}</tr></thead><tbody>`;
+    for (const s of S) h += `<tr><td>${esc(s.system)}</td>${fams.map((f) => { const v = s.by_family[f];
+      return `<td class="heat" style="background:color-mix(in srgb, var(--primary) ${Math.round(28 * (v ?? 0))}%, transparent)">${pct(v)}</td>`; }).join("")}</tr>`;
+    h += `</tbody></table></div></div>`;
+    h += `<p class="hint">Scores are computed by fixed rules, with no LLM judging. Test messages are synthetic and template-built from cited interpreter and dictionary sources; see the data card on GitHub.</p>`;
+    $("#bench-status").outerHTML = h;
+  } catch (e) {
+    $("#bench-status").textContent = "Results are not available yet.";
+  }
+}
+</script>
+</body>
+</html>

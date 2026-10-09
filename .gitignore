@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+.hf_cache/
+jobs/local/
+runs/raw/
+runs/logs/
+.pytest_cache/
+models/

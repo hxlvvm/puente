@@ -1,0 +1,11 @@
+.venv/
+.hf_cache/
+models/
+runs/raw/
+runs/logs/
+jobs/
+tests/
+bench/
+data/
+docs/
+*.md

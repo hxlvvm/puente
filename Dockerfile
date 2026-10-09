@@ -7,6 +7,7 @@ RUN pip install --no-cache-dir -r requirements.txt \
  && if [ "$WITH_ASR" = "1" ]; then pip install --no-cache-dir -r requirements-asr.txt; fi
 COPY puente/ puente/
 COPY serve/ serve/
+COPY public/ public/
 # gemini (set GEMINI_API_KEY at run time), or rules for the keyword baseline with no key
 ENV PUENTE_BACKEND=gemini
 EXPOSE 8000
